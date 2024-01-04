@@ -87,4 +87,15 @@ public class VotacaoService {
         if (votacao.isExpirado() || votacao.isClosed())
             throw new BusinessException("Votação já se encontrada expirada/fechada.");
     }
+
+    @Scheduled(fixedDelay = 1000)
+    private void fecharESalvarResultadoVotacoesExpiradas() {
+        List<Votacao> votacoes = votacaoRepository.
+                findAll().stream().filter(v -> v.isExpirado() && !v.isClosed()).collect(Collectors.toList());
+
+        votacoes.forEach(v -> {
+            v.setClosed(true);
+            votacaoRepository.save(v);
+        });
+    }
 }
