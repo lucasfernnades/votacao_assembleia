@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,9 @@ public class VotacaoService {
 
     @Autowired
     private VotacaoRepository votacaoRepository;
+
+    @Autowired
+    private ValidadorCpfService validadorCpfService;
 
     public List<VotacaoResponseDTO> listarTodasVotacoes() {
         return votacaoRepository.findAll().stream().map(VotacaoResponseDTO::new).collect(Collectors.toList());
@@ -86,6 +90,13 @@ public class VotacaoService {
 
         if (votacao.isExpirado() || votacao.isClosed())
             throw new BusinessException("Votação já se encontrada expirada/fechada.");
+
+        try {
+            if (!validadorCpfService.isCpfvalido(dto.getCpf()))
+                throw new BusinessException("CPF inválido, favor digite um CPF válido para votar");
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Scheduled(fixedDelay = 1000)
