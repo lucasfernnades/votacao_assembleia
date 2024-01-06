@@ -1,6 +1,8 @@
 package com.sicredi.votacao_assembleia.dto;
 
-public class ResultadoVotacaoResponseDTO {
+import java.io.Serializable;
+
+public class ResultadoVotacaoResponseDTO implements Serializable {
 
     private PautaResponseDTO pauta;
 
@@ -36,5 +38,14 @@ public class ResultadoVotacaoResponseDTO {
 
     public void setQtdNao(Long qtdNao) {
         this.qtdNao = qtdNao;
+    }
+
+    @Override
+    public String toString() {
+        return "\nResultadoVotacaoResponseDTO {\n" +
+                "   pauta= " + pauta + "\n" +
+                "   qtdSim= " + qtdSim + "\n" +
+                "   qtdNao= " + qtdNao + "\n" +
+                "}";
     }
 }

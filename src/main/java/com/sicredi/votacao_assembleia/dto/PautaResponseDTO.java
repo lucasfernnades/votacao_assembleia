@@ -2,9 +2,9 @@ package com.sicredi.votacao_assembleia.dto;
 
 import com.sicredi.votacao_assembleia.entities.Pauta;
 
-import java.nio.ByteBuffer;
+import java.io.Serializable;
 
-public class PautaResponseDTO {
+public class PautaResponseDTO implements Serializable {
 
     private String id;
 
@@ -49,5 +49,14 @@ public class PautaResponseDTO {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    @Override
+    public String toString() {
+        return "PautaResponseDTO {\n" +
+                "      id= " + id + "\n" +
+                "      name= " + name + "\n" +
+                "      descricao= " + descricao + "\n" +
+                "   }";
     }
 }

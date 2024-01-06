@@ -1,5 +1,6 @@
 package com.sicredi.votacao_assembleia.services;
 
+import com.sicredi.votacao_assembleia.constants.RabbitMqConstants;
 import com.sicredi.votacao_assembleia.dto.*;
 import com.sicredi.votacao_assembleia.entities.Pauta;
 import com.sicredi.votacao_assembleia.entities.Votacao;
@@ -27,6 +28,9 @@ public class VotacaoService {
 
     @Autowired
     private ValidadorCpfService validadorCpfService;
+
+    @Autowired
+    private RabbitMqService rabbitMqService;
 
     public List<VotacaoResponseDTO> listarTodasVotacoes() {
         return votacaoRepository.findAll().stream().map(VotacaoResponseDTO::new).collect(Collectors.toList());
@@ -107,6 +111,9 @@ public class VotacaoService {
         votacoes.forEach(v -> {
             v.setClosed(true);
             votacaoRepository.save(v);
+
+            ResultadoVotacaoResponseDTO resultadoVotacaoDto = getResultadoVotacao(v.getId().toString());
+            rabbitMqService.sendMessage(RabbitMqConstants.FILA_RESULTADO_VOTACAO, resultadoVotacaoDto);
         });
     }
 }
