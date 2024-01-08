@@ -17,6 +17,9 @@ public class PautaService {
     @Autowired
     private PautaRepository repository;
 
+    @Autowired
+    private PautaRedisService redisService;
+
     public List<PautaResponseDTO> listarTodasPautas() {
         return repository.findAll().stream().map(PautaResponseDTO::new).collect(Collectors.toList());
     }
@@ -27,6 +30,10 @@ public class PautaService {
     }
 
     public PautaResponseDTO criarNovaPauta(PautaRequestDTO dto) {
-        return new PautaResponseDTO(repository.save(new Pauta(dto.getNome(), dto.getDescricao())));
+        PautaResponseDTO pautaResponseDTO = new PautaResponseDTO(
+                repository.save(new Pauta(dto.getNome(), dto.getDescricao())));
+
+        redisService.adicionaNovaPautaNaListaCache(pautaResponseDTO);
+        return pautaResponseDTO;
     }
 }

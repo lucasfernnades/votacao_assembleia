@@ -1,9 +1,7 @@
 package com.sicredi.votacao_assembleia.controllers;
 
-import com.sicredi.votacao_assembleia.dto.VotacaoRequestDTO;
-import com.sicredi.votacao_assembleia.dto.VotacaoResponseDTO;
-import com.sicredi.votacao_assembleia.dto.VotoRequestDTO;
-import com.sicredi.votacao_assembleia.dto.VotoResponseDTO;
+import com.sicredi.votacao_assembleia.dto.*;
+import com.sicredi.votacao_assembleia.services.VotacaoRedisService;
 import com.sicredi.votacao_assembleia.services.VotacaoService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -20,13 +18,16 @@ public class VotacaoController {
     @Autowired
     private VotacaoService service;
 
+    @Autowired
+    private VotacaoRedisService votacaoRedisService;
+
     @ApiOperation(value="Retorna todas as votações", response = VotacaoResponseDTO.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Votações encontradas.")
     })
     @GetMapping()
-    public ResponseEntity<?> getTodasVotacoes(){
-        return ResponseEntity.ok(service.listarTodasVotacoes());
+    public ResponseEntity<?> getTodasVotacoes() {
+        return ResponseEntity.ok(votacaoRedisService.findAll());
     }
 
     @ApiOperation(value="Retorna uma votação", response = VotacaoResponseDTO.class)
@@ -34,8 +35,8 @@ public class VotacaoController {
             @ApiResponse(code = 200, message = "Votação encontrada.")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<?> getVotacao(@PathVariable String id){
-        return ResponseEntity.ok(service.getVotacao(id));
+    public ResponseEntity<?> getVotacao(@PathVariable String id) {
+        return ResponseEntity.ok(votacaoRedisService.getById(id));
     }
 
     @ApiOperation(value="Cria uma nova votação", response = VotacaoResponseDTO.class)
@@ -53,17 +54,16 @@ public class VotacaoController {
             @ApiResponse(code = 200, message = "Voto adicionado com sucesso.")
     })
     @PutMapping("/voto")
-    public ResponseEntity<?> voto(@RequestBody VotoRequestDTO voto) {
-        VotoResponseDTO response = service.adicionarVoto(voto);
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<?> adicionarVoto(@RequestBody VotoRequestDTO voto) {
+        return ResponseEntity.ok().body(service.adicionarVoto(voto));
     }
 
-    @ApiOperation(value="Retorna o resultado da votação", response = VotacaoResponseDTO.class)
+    @ApiOperation(value="Retorna o resultado da votação", response = ResultadoVotacaoResponseDTO.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Resultado da votação encontrado.")
     })
     @GetMapping("/resultado/{id}")
-    public ResponseEntity<?> getResultadoVotacao(@PathVariable String id){
+    public ResponseEntity<?> getResultadoVotacao(@PathVariable String id) {
         return ResponseEntity.ok(service.getResultadoVotacao(id));
     }
 }

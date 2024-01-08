@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +33,9 @@ public class VotacaoService {
     @Autowired
     private RabbitMqService rabbitMqService;
 
+    @Autowired
+    private VotacaoRedisService votacaoRedisService;
+
     public List<VotacaoResponseDTO> listarTodasVotacoes() {
         return votacaoRepository.findAll().stream().map(VotacaoResponseDTO::new).collect(Collectors.toList());
     }
@@ -43,7 +47,7 @@ public class VotacaoService {
 
     public ResultadoVotacaoResponseDTO getResultadoVotacao(String id) {
         Votacao votacao = votacaoRepository.
-                findById(new ObjectId(id)).orElseThrow(NullPointerException::new);
+                    findById(new ObjectId(id)).orElseThrow(NullPointerException::new);
 
         if (!votacao.isClosed())
             throw new BusinessException(
@@ -66,7 +70,11 @@ public class VotacaoService {
 
         Votacao votacao = new Votacao(pauta, tempoParaExpirar);
 
-        return new VotacaoResponseDTO(votacaoRepository.save(votacao));
+        VotacaoResponseDTO votacaoResponseDTO = new VotacaoResponseDTO(votacaoRepository.save(votacao));
+
+        votacaoRedisService.adicionaNovaVotacaoNoCache(votacaoResponseDTO);
+
+        return votacaoResponseDTO;
     }
 
     public VotoResponseDTO adicionarVoto(VotoRequestDTO dto) {

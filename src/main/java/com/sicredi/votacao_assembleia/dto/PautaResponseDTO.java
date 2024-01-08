@@ -8,22 +8,22 @@ public class PautaResponseDTO implements Serializable {
 
     private String id;
 
-    private String name;
+    private String nome;
 
     private String descricao;
 
     public PautaResponseDTO() {
     }
 
-    public PautaResponseDTO(String id, String name, String descricao) {
+    public PautaResponseDTO(String id, String nome, String descricao) {
         this.id = id;
-        this.name = name;
+        this.nome = nome;
         this.descricao = descricao;
     }
 
     public PautaResponseDTO(Pauta pauta) {
         this.id = pauta.getId().toString();
-        this.name = pauta.getNome();
+        this.nome = pauta.getNome();
         this.descricao = pauta.getDescricao();
     }
 
@@ -35,12 +35,12 @@ public class PautaResponseDTO implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getNome() {
+        return nome;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getDescricao() {
@@ -55,7 +55,7 @@ public class PautaResponseDTO implements Serializable {
     public String toString() {
         return "PautaResponseDTO {\n" +
                 "      id= " + id + "\n" +
-                "      name= " + name + "\n" +
+                "      nome= " + nome + "\n" +
                 "      descricao= " + descricao + "\n" +
                 "   }";
     }

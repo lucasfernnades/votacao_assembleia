@@ -1,14 +1,18 @@
-package com.sicredi.votacao_assembleia.dto;
+package com.sicredi.votacao_assembleia.entities;
 
-import com.sicredi.votacao_assembleia.entities.Votacao;
-import com.sicredi.votacao_assembleia.entities.Voto;
+import com.sicredi.votacao_assembleia.dto.PautaResponseDTO;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
-import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.List;
 
-public class VotacaoResponseDTO {
+@RedisHash("votacao")
+public class VotacaoRedis {
 
+    @Id
+    @Indexed
     private String id;
 
     private PautaResponseDTO pautaDto;
@@ -21,10 +25,20 @@ public class VotacaoResponseDTO {
 
     private boolean closed;
 
-    public VotacaoResponseDTO() {
+    public VotacaoRedis() {
     }
 
-    public VotacaoResponseDTO(Votacao votacao) {
+    public VotacaoRedis(String id, PautaResponseDTO pautaDto, Integer tempoParaExpirar,
+                        Instant dataExpiracao, List<Voto> votos, boolean closed) {
+        this.id = id;
+        this.pautaDto = pautaDto;
+        this.tempoParaExpirar = tempoParaExpirar;
+        this.dataExpiracao = dataExpiracao;
+        this.votos = votos;
+        this.closed = closed;
+    }
+
+    public VotacaoRedis(Votacao votacao) {
         this.id = votacao.getId().toString();
         this.pautaDto = new PautaResponseDTO(votacao.getPauta());
         this.tempoParaExpirar = votacao.getTempoParaExpirar();
