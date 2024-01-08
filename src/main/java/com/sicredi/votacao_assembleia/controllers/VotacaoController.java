@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping(value = "votacao")
+@RequestMapping(value = "v1.0/votacao")
 public class VotacaoController {
 
     @Autowired

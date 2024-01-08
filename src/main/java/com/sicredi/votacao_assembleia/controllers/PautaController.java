@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping(value = "/pauta")
+@RequestMapping(value = "v1.0/pauta")
 public class PautaController {
 
     @Autowired
