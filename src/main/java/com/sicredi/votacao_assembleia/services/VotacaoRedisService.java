@@ -72,4 +72,10 @@ public class VotacaoRedisService {
 
         redisRepository.saveAll(votacaoRedis);
     }
+
+    public void saveVotoCache(VotacaoResponseDTO dto) {
+        redisRepository.delete(modelMapper.map(getById(dto.getId()), VotacaoRedis.class));
+
+        redisRepository.save(modelMapper.map(dto, VotacaoRedis.class));
+    }
 }

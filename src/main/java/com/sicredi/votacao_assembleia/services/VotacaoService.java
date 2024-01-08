@@ -4,11 +4,13 @@ import com.sicredi.votacao_assembleia.constants.RabbitMqConstants;
 import com.sicredi.votacao_assembleia.dto.*;
 import com.sicredi.votacao_assembleia.entities.Pauta;
 import com.sicredi.votacao_assembleia.entities.Votacao;
+import com.sicredi.votacao_assembleia.entities.VotacaoRedis;
 import com.sicredi.votacao_assembleia.entities.Voto;
 import com.sicredi.votacao_assembleia.exception.BusinessException;
 import com.sicredi.votacao_assembleia.repositories.PautaRepository;
 import com.sicredi.votacao_assembleia.repositories.VotacaoRepository;
 import org.bson.types.ObjectId;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,9 @@ public class VotacaoService {
 
     @Autowired
     private VotacaoRedisService votacaoRedisService;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     public List<VotacaoResponseDTO> listarTodasVotacoes() {
         return votacaoRepository.findAll().stream().map(VotacaoResponseDTO::new).collect(Collectors.toList());
@@ -88,7 +93,9 @@ public class VotacaoService {
 
         Voto voto = new Voto(dto.getCpf(), dto.getResposta());
         votacao.addVoto(voto);
-        votacaoRepository.save(votacao);
+
+        VotacaoResponseDTO votacaoResponseDTO = new VotacaoResponseDTO(votacaoRepository.save(votacao));
+        votacaoRedisService.saveVotoCache(votacaoResponseDTO);
 
         return new VotoResponseDTO(true);
     }
