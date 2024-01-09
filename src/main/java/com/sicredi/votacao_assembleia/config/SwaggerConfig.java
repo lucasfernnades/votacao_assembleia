@@ -12,7 +12,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
-    private static final String api_package = "com.sicredi.votacao_assembleia";
+    private static final String API_PACKAGE = "com.sicredi.votacao_assembleia";
 
     @Bean
     public Docket assemblyApi() {
@@ -20,7 +20,7 @@ public class SwaggerConfig {
                 .useDefaultResponseMessages(false)
                 .groupName("1.0")
                 .select()
-                .apis(RequestHandlerSelectors.basePackage(api_package))
+                .apis(RequestHandlerSelectors.basePackage(API_PACKAGE))
                 .build()
                 .apiInfo(apiInfo("1.0"));
     }

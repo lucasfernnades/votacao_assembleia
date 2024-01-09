@@ -4,55 +4,44 @@ import com.sicredi.votacao_assembleia.constants.RabbitMqConstants;
 import com.sicredi.votacao_assembleia.dto.*;
 import com.sicredi.votacao_assembleia.entities.Pauta;
 import com.sicredi.votacao_assembleia.entities.Votacao;
-import com.sicredi.votacao_assembleia.entities.VotacaoRedis;
 import com.sicredi.votacao_assembleia.entities.Voto;
 import com.sicredi.votacao_assembleia.exception.BusinessException;
 import com.sicredi.votacao_assembleia.repositories.PautaRepository;
 import com.sicredi.votacao_assembleia.repositories.VotacaoRepository;
 import org.bson.types.ObjectId;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class VotacaoService {
 
-    @Autowired
-    private PautaRepository pautaRepository;
+    private final PautaRepository pautaRepository;
 
-    @Autowired
-    private VotacaoRepository votacaoRepository;
+    private final VotacaoRepository votacaoRepository;
 
-    @Autowired
-    private ValidadorCpfService validadorCpfService;
+    private final ValidadorCpfService validadorCpfService;
 
-    @Autowired
-    private RabbitMqService rabbitMqService;
+    private final RabbitMqService rabbitMqService;
 
-    @Autowired
-    private VotacaoRedisService votacaoRedisService;
+    private final VotacaoRedisService votacaoRedisService;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
-    public List<VotacaoResponseDTO> listarTodasVotacoes() {
-        return votacaoRepository.findAll().stream().map(VotacaoResponseDTO::new).collect(Collectors.toList());
-    }
-
-    public VotacaoResponseDTO getVotacao(String id) {
-        return new VotacaoResponseDTO(votacaoRepository.
-                findById(new ObjectId(id)).orElseThrow(NullPointerException::new));
+    public VotacaoService(PautaRepository pautaRepository, VotacaoRepository votacaoRepository,
+                          ValidadorCpfService validadorCpfService, RabbitMqService rabbitMqService,
+                          VotacaoRedisService votacaoRedisService) {
+        this.pautaRepository = pautaRepository;
+        this.votacaoRepository = votacaoRepository;
+        this.validadorCpfService = validadorCpfService;
+        this.rabbitMqService = rabbitMqService;
+        this.votacaoRedisService = votacaoRedisService;
     }
 
     public ResultadoVotacaoResponseDTO getResultadoVotacao(String id) {
         Votacao votacao = votacaoRepository.
-                    findById(new ObjectId(id)).orElseThrow(NullPointerException::new);
+                    findById(new ObjectId(id)).orElseThrow(() -> new BusinessException("Nenhuma votação encontrada!"));
 
         if (!votacao.isClosed())
             throw new BusinessException(
@@ -66,7 +55,8 @@ public class VotacaoService {
     }
 
     public VotacaoResponseDTO criarNovaVotacao(VotacaoRequestDTO dto) {
-        Pauta pauta = pautaRepository.findById(new ObjectId(dto.getPautaId())).orElseThrow(NullPointerException::new);
+        Pauta pauta = pautaRepository.findById(new ObjectId(dto.getPautaId())).orElseThrow(
+                () -> new BusinessException("Nenhuma pauta encontrada!"));
 
         Integer tempoParaExpirar = dto.getTempoParaExpirar();
         if (tempoParaExpirar == null || tempoParaExpirar <= 0) {
@@ -84,7 +74,8 @@ public class VotacaoService {
 
     public VotoResponseDTO adicionarVoto(VotoRequestDTO dto) {
         Votacao votacao = votacaoRepository.findById(
-                new ObjectId(dto.getVotacaoId())).orElseThrow(NullPointerException::new);
+                new ObjectId(dto.getVotacaoId())).orElseThrow(
+                        () -> new BusinessException("Nenhuma votação encontrada!"));
 
         validarVoto(votacao, dto);
 
@@ -114,7 +105,8 @@ public class VotacaoService {
             if (!validadorCpfService.isCpfvalido(dto.getCpf()))
                 throw new BusinessException("CPF inválido, favor digite um CPF válido para votar");
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
+            throw new BusinessException("O serviço de validação de CPF foi interrompido ou está indisponivel.");
         }
     }
 

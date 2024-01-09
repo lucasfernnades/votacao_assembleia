@@ -1,36 +1,28 @@
 package com.sicredi.votacao_assembleia.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.validation.constraints.NotNull;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 public class VotoRequestDTO {
 
+    private final String errorValid = "Campo não pode ser nulo nem vazio";
+
+    @NotNull(message = errorValid)
     private String votacaoId;
 
+    @NotNull(message = errorValid)
     private String resposta;
 
+    @NotNull(message = errorValid)
     private String cpf;
-
-    public String getVotacaoId() {
-        return votacaoId;
-    }
-
-    public void setVotacaoId(String votacaoId) {
-        this.votacaoId = votacaoId;
-    }
-
-    public String getResposta() {
-        return resposta;
-    }
-
-    public void setResposta(String resposta) {
-        this.resposta = resposta;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
 
     public boolean formatoRespostaValido(String resposta) {
         String[] possiveisRespostas = {"sim", "não", "nao"};

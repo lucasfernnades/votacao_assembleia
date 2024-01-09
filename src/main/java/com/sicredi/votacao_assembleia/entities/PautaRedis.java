@@ -1,11 +1,17 @@
 package com.sicredi.votacao_assembleia.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
-import java.io.Serializable;
-
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 @RedisHash("pauta")
 public class PautaRedis {
 
@@ -16,37 +22,4 @@ public class PautaRedis {
     private String nome;
 
     private String descricao;
-
-    public PautaRedis() {
-    }
-
-    public PautaRedis(String id, String nome, String descricao) {
-        this.id = id;
-        this.nome = nome;
-        this.descricao = descricao;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
 }

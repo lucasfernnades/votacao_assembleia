@@ -1,9 +1,9 @@
 package com.sicredi.votacao_assembleia.services;
 
-import com.sicredi.votacao_assembleia.dto.PautaRequestDTO;
 import com.sicredi.votacao_assembleia.dto.PautaResponseDTO;
 import com.sicredi.votacao_assembleia.entities.Pauta;
 import com.sicredi.votacao_assembleia.entities.PautaRedis;
+import com.sicredi.votacao_assembleia.exception.BusinessException;
 import com.sicredi.votacao_assembleia.repositories.PautaRedisRepository;
 import com.sicredi.votacao_assembleia.repositories.PautaRepository;
 import org.bson.types.ObjectId;
@@ -18,17 +18,19 @@ import java.util.List;
 @Service
 public class PautaRedisService {
 
-    @Autowired
-    private PautaRedisRepository redisRepository;
+    private final PautaRedisRepository redisRepository;
+
+    private final PautaRepository mongoRepository;
+
+    private final ModelMapper modelMapper;
 
     @Autowired
-    private PautaRepository mongoRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
-    private PautaService pautaService;
+    public PautaRedisService(PautaRedisRepository redisRepository,
+                             PautaRepository mongoRepository, ModelMapper modelMapper) {
+        this.redisRepository = redisRepository;
+        this.mongoRepository = mongoRepository;
+        this.modelMapper = modelMapper;
+    }
 
     public List<PautaResponseDTO> findAll() {
         List<PautaRedis> pautasRedis = (List<PautaRedis>) redisRepository.findAll();
@@ -55,11 +57,13 @@ public class PautaRedisService {
         Pauta pauta;
 
         if (redisRepository.findById(id).isEmpty()) {
-            pauta = mongoRepository.findById(new ObjectId(id)).get();
+            pauta = mongoRepository.findById(new ObjectId(id)).orElseThrow(
+                    () -> new BusinessException("Nenhuma pauta encontrada no MongoDb!"));
             return new PautaResponseDTO(pauta);
         }
 
-        PautaRedis pautaRedis = redisRepository.findById(id).get();
+        PautaRedis pautaRedis = redisRepository.findById(id).orElseThrow(
+                () -> new BusinessException("Nenhuma pauta encontrada no Redis!"));
 
         return modelMapper.map(pautaRedis, PautaResponseDTO.class);
     }
