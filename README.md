@@ -12,10 +12,10 @@ API REST para votação de pautas em assembleia
 - Redis
 - Docker
 
-O projeto se encontra hospedado em uma instância do EC2, sendo possivel as requisições atraves da url **http://ec2-54-237-115-229.compute-1.amazonaws.com:8080/...**
+O projeto se encontra hospedado em uma instância do EC2, sendo possivel as requisições atraves da url **ec2-54-237-115-229.compute-1.amazonaws.com:8080/...**
 
 Duvidas sobre endpoints e conteúdo das requisições acesse:
-- **http://ec2-54-237-115-229.compute-1.amazonaws.com:8080/swagger-ui.html**
+- **ec2-54-237-115-229.compute-1.amazonaws.com:8080/swagger-ui.html**
 
 ## Tarefa Bônus 1 - Integração com sistemas externos
 Devido ao **https://user-info.herokuapp.com/users/{cpf}** estar fora de funcionamento durante o desenvolvimento do projeto, o mesmo foi substituido pela integração com a api de validação de CPF disponivel atraves do site **https://api.invertexto.com/**.
